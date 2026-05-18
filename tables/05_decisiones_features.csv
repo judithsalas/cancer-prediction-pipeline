@@ -1,0 +1,8 @@
+variable,decision,motivo,justificacion
+paciente_id,EXCLUIR,identificador,"Identificador unico, no es predictor"
+alcohol,EXCLUIR,constante,vale 1 en los 50.001 pacientes (std=0)
+coste_total,EXCLUIR,data_leakage,"Coste post-diagnostico (r=+0,89 con cancer)"
+dias_hospital,EXCLUIR,data_leakage,"Hospitalizacion post-diagnostico (r=+0,88)"
+coste_farmaco,EXCLUIR,data_leakage,"Medicacion oncologica post-dx (r=+0,85)"
+num_ingresos,EXCLUIR,data_leakage,"Reingresos derivados del seguimiento (r=+0,64)"
+vive,EXCLUIR,data_leakage,"Mortalidad es desenlace, no antecedente"

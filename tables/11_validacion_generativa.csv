@@ -1,0 +1,16 @@
+,importancia_aprendida,peso_generativo_abs
+n_mutaciones,0.1321,0.0
+fumador,0.1237,1.5
+obesidad,0.0847,1.1
+mut_BRCA1,0.0554,2.0
+mut_TP53,0.0424,1.8
+glucosa,0.0424,1.2
+tipo_seguro_Privado,0.0423,0.0
+tipo_seguro_Publico,0.0343,0.0
+actividad_fisica,0.0312,1.2
+mut_KRAS,0.0287,1.4
+leucocitos,0.0287,0.7
+trigliceridos,0.0262,0.0
+colesterol,0.026,0.0
+hemoglobina,0.0259,0.9
+edad,0.024,0.4

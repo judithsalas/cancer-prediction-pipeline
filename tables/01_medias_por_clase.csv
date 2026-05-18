@@ -1,0 +1,15 @@
+,0,1,delta_pct
+edad,54.039,56.071,3.76
+glucosa,100.78,108.101,7.264
+colesterol,192.274,199.464,3.74
+trigliceridos,153.951,165.768,7.676
+hemoglobina,13.981,13.696,-2.035
+leucocitos,7.062,7.524,6.55
+plaquetas,255.063,254.584,-0.188
+creatinina,1.0,0.999,-0.058
+num_hijos,1.497,1.496,-0.088
+distancia_hospital_km,24.849,24.914,0.261
+coste_total,8069.163,44889.423,456.308
+coste_farmaco,2622.866,14584.744,456.061
+num_ingresos,0.494,2.498,405.747
+dias_hospital,13.104,74.328,467.224

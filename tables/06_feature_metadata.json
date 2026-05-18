@@ -1,0 +1,92 @@
+{
+  "n_features": 32,
+  "numericas_continuas": [
+    "edad",
+    "glucosa",
+    "colesterol",
+    "trigliceridos",
+    "hemoglobina",
+    "leucocitos",
+    "plaquetas",
+    "creatinina",
+    "num_hijos",
+    "distancia_hospital_km",
+    "n_mutaciones",
+    "n_comorbilidades"
+  ],
+  "binarias": [
+    "diabetes",
+    "hipertension",
+    "obesidad",
+    "enfermedad_cardiaca",
+    "asma",
+    "epoc",
+    "fumador",
+    "mut_BRCA1",
+    "mut_TP53",
+    "mut_EGFR",
+    "mut_KRAS",
+    "mut_PIK3CA",
+    "mut_ALK",
+    "mut_BRAF"
+  ],
+  "ordinales": {
+    "actividad_fisica": [
+      "Baja",
+      "Moderada",
+      "Alta"
+    ],
+    "nivel_educativo": [
+      "Sin estudios",
+      "Primaria",
+      "Secundaria",
+      "Universitario"
+    ],
+    "nivel_ingresos": [
+      "Muy bajo",
+      "Bajo",
+      "Medio",
+      "Alto"
+    ]
+  },
+  "nominales": {
+    "zona": "OneHot drop=first",
+    "estado_civil": "OneHot drop=first",
+    "tipo_seguro": "OneHot drop=first"
+  },
+  "target": "cancer",
+  "exclusiones": [
+    "paciente_id",
+    "alcohol",
+    "coste_total",
+    "dias_hospital",
+    "coste_farmaco",
+    "num_ingresos",
+    "vive"
+  ],
+  "feature_engineering": {
+    "n_mutaciones": {
+      "derivada_de": [
+        "mut_BRCA1",
+        "mut_TP53",
+        "mut_EGFR",
+        "mut_KRAS",
+        "mut_PIK3CA",
+        "mut_ALK",
+        "mut_BRAF"
+      ],
+      "spearman_rho": 0.2935
+    },
+    "n_comorbilidades": {
+      "derivada_de": [
+        "diabetes",
+        "hipertension",
+        "obesidad",
+        "enfermedad_cardiaca",
+        "asma",
+        "epoc"
+      ],
+      "spearman_rho": 0.1846
+    }
+  }
+}

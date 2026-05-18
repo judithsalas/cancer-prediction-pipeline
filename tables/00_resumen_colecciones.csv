@@ -1,0 +1,7 @@
+coleccion,n_filas,n_columnas,columnas
+bioquimicos,50001,8,"paciente_id, glucosa, colesterol, trigliceridos, hemoglobina, leucocitos, plaquetas, creatinina"
+clinicos,50001,8,"paciente_id, diabetes, hipertension, obesidad, cancer, enfermedad_cardiaca, asma, epoc"
+geneticos,50001,8,"paciente_id, mut_BRCA1, mut_TP53, mut_EGFR, mut_KRAS, mut_PIK3CA, mut_ALK, mut_BRAF"
+economicos,50001,6,"paciente_id, tipo_seguro, coste_total, coste_farmaco, num_ingresos, dias_hospital"
+generales,50001,5,"paciente_id, fumador, alcohol, actividad_fisica, vive"
+sociodemograficos,50001,8,"paciente_id, edad, nivel_educativo, nivel_ingresos, zona, estado_civil, num_hijos, distancia_hospital_km"
