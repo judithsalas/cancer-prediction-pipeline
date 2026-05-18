@@ -97,10 +97,39 @@ for d in (FIGS_DIR, TABLES_DIR, MODELS_DIR):
 
 
 def section(title):
-    """Imprime un encabezado de seccion grande para separar fases en logs."""
-    print("\n" + "=" * 78)
-    print(f" {title}")
-    print("=" * 78)
+    """Imprime un encabezado de seccion con caja Unicode."""
+    width = 78
+    print()
+    print("┏" + "━" * (width - 2) + "┓")
+    pad   = width - 2 - len(title) - 2
+    print("┃ " + title + " " * pad + " ┃")
+    print("┗" + "━" * (width - 2) + "┛")
+
+
+def header(text, level=1):
+    """Imprime un subtitulo con el nivel indicado."""
+    if level == 1:
+        print(f"\n  ▸ {text}")
+    elif level == 2:
+        print(f"     • {text}")
+    else:
+        print(f"        {text}")
+
+
+def kv(key, value, color=None):
+    """Imprime una linea de clave: valor alineada."""
+    print(f"     {key:<22} {value}")
+
+
+def banner_inicio():
+    """Banner inicial del pipeline."""
+    print()
+    print("╔" + "═" * 76 + "╗")
+    print("║" + " " * 76 + "║")
+    print("║" + "  CASO PRACTICO — Prediccion de diagnostico de cancer".ljust(76) + "║")
+    print("║" + "  UAX · Ingenieria Matematica · Inteligencia Artificial · 2025/26".ljust(76) + "║")
+    print("║" + " " * 76 + "║")
+    print("╚" + "═" * 76 + "╝")
 
 
 # =============================================================================
@@ -978,7 +1007,7 @@ def fase_5_mlp(class_weight, fast=False):
     N_FEATURES = X_train.shape[1]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"\n  Dispositivo: {device}")
+    header(f"Dispositivo: {device}", level=1)
 
     # Tensores en device
     X_train_t = torch.from_numpy(X_train).to(device)
@@ -996,8 +1025,8 @@ def fase_5_mlp(class_weight, fast=False):
     DENSE = (240, 120, 60); DROP = (0.25, 0.25, 0.20)
     model = MLPClassifier(N_FEATURES, hidden=DENSE, dropout=DROP).to(device)
     n_params = sum(p.numel() for p in model.parameters())
-    print(f"  Arquitectura: {N_FEATURES} -> {DENSE[0]} -> {DENSE[1]} -> {DENSE[2]} -> 1")
-    print(f"  Parametros:   {n_params:,}  (objetivo del PDF: 46.913)")
+    header(f"Arquitectura: {N_FEATURES} -> {DENSE[0]} -> {DENSE[1]} -> {DENSE[2]} -> 1", level=1)
+    header(f"Parametros:   {n_params:,}  (objetivo del PDF: 46.913)", level=2)
 
     # Loss con class_weight (pos_weight reescala la clase positiva)
     pos_weight = torch.tensor([float(class_weight[1] / class_weight[0])], device=device)
@@ -1012,7 +1041,7 @@ def fase_5_mlp(class_weight, fast=False):
     PATIENCE  = 8 if fast else 12
     stopper   = _EarlyStop(patience=PATIENCE)
 
-    print(f"  Entrenando: max {EPOCHS} epocas, early-stop patience={PATIENCE}...")
+    header(f"Entrenando: max {EPOCHS} epocas, early-stop patience={PATIENCE}", level=1)
     history = {"loss": [], "val_loss": [], "accuracy": [], "val_accuracy": [],
                "auc":  [], "val_auc":  []}
     t0 = time.time()
@@ -1056,7 +1085,7 @@ def fase_5_mlp(class_weight, fast=False):
         # Early stopping
         stopper.step(val_loss, model)
         if stopper.should_stop:
-            print(f"  Epoch {epoch}: early stopping (mejor val_loss={stopper.best_loss:.4f})")
+            header(f"Epoch {epoch}: early stopping (mejor val_loss={stopper.best_loss:.4f})", level=2)
             stopper.restore(model)
             break
     else:
@@ -1064,7 +1093,7 @@ def fase_5_mlp(class_weight, fast=False):
 
     t_train  = time.time() - t0
     n_epocas = len(history["loss"])
-    print(f"  Entrenamiento: {n_epocas} epocas, {t_train:.1f}s")
+    header(f"Entrenamiento completado: {n_epocas} epocas en {t_train:.1f}s", level=2)
 
     # ===== Predicciones finales =====
     model.eval()
@@ -1080,7 +1109,7 @@ def fase_5_mlp(class_weight, fast=False):
     }, MODELS_DIR / "mlp_best.pt")
 
     # ===== Threshold tuning SOBRE VALIDACION =====
-    print("  Threshold tuning sobre VALIDACION (rango [0.10, 0.90] paso 0.01)...")
+    header("Threshold tuning sobre VALIDACION (rango [0.10, 0.90] paso 0.01)", level=1)
     rows = []
     for t in np.arange(0.10, 0.91, 0.01):
         pred = (proba_val >= t).astype(int)
@@ -1094,7 +1123,7 @@ def fase_5_mlp(class_weight, fast=False):
     df_thr.to_csv(TABLES_DIR / "13_threshold_search.csv", index=False)
     best_idx = df_thr["f1"].idxmax()
     best_threshold = float(df_thr.loc[best_idx, "threshold"])
-    print(f"  Umbral optimo (val): {best_threshold:.2f}  F1_val={df_thr.loc[best_idx,'f1']:.4f}")
+    header(f"Umbral optimo encontrado: {best_threshold:.2f}  (F1_val = {df_thr.loc[best_idx,'f1']:.4f})", level=2)
 
     # ===== Evaluacion final SOBRE TEST =====
     def eval_t(t, etiqueta):
@@ -1114,8 +1143,10 @@ def fase_5_mlp(class_weight, fast=False):
     met_opt = eval_t(best_threshold, f"umbral={best_threshold:.2f}")
     df_mlp = pd.DataFrame([met_50, met_opt])
     df_mlp.to_csv(TABLES_DIR / "12_metricas_mlp.csv", index=False)
-    print("METRICAS MLP:")
-    print(df_mlp.to_string(index=False))
+    header("Metricas del MLP sobre test:", level=1)
+    print()
+    for line in df_mlp.to_string(index=False).split("\n"):
+        print("        " + line)
 
     # ===== Figuras MLP =====
     # Figura 15: arquitectura visual
@@ -1259,8 +1290,10 @@ def fase_6_comparativa(best_threshold):
                    .reset_index(drop=True)
     df_resumen["rank"] = df_resumen.index + 1
     df_resumen.to_csv(TABLES_DIR / "15_resumen_ejecutivo.csv", index=False)
-    print("\nRANKING FINAL (por F1):")
-    print(df_resumen[["rank","modelo","f1","auc_roc","precision","recall"]].to_string(index=False))
+    header("Resumen ejecutivo (5 modelos, sin duplicar MLP umbral 0.50):", level=1)
+    print()
+    for line in df_resumen[["rank","modelo","f1","auc_roc","precision","recall"]].to_string(index=False).split("\n"):
+        print("     " + line)
 
     # Diccionario de probabilidades por modelo (para curvas)
     proba_dict = {n: ml["proba_test"][:, i] for i, n in enumerate(ml_names)}
@@ -1373,9 +1406,10 @@ def fase_6_comparativa(best_threshold):
     plt.savefig(FIGS_DIR / "23_calibracion.png")
     plt.close()
 
-    print("\n  Brier scores (menor = mejor calibrado):")
+    header("Brier scores (menor = mejor calibrado):", level=1)
+    print()
     for n, p in proba_dict.items():
-        print(f"    {n:25s}: {brier_score_loss(y_test, p):.4f}")
+        print(f"        · {n:<24s} {brier_score_loss(y_test, p):.4f}")
 
     # Figura 24: ranking visual
     fig, ax = plt.subplots(figsize=(11, 6))
@@ -1426,17 +1460,15 @@ regeneran tablas y figuras finales. La ejecucion completa desde cero tarda
                         help="Modo rapido: menos arboles y menos epocas (~2 min)")
     args = parser.parse_args()
 
-    print("\n" + "=" * 78)
-    print(" CASO PRACTICO — Prediccion de diagnostico de cancer")
-    print(" UAX · Ingenieria Matematica · IA · 2025/26")
-    print("=" * 78)
-    print(f"\n  Directorio raiz: {ROOT}")
-    print(f"  Seed:            {SEED}")
-    print(f"  Backend MLP:     PyTorch (cudnn.deterministic = True)")
-    modo = ("FORCE (re-entrenar todo)" if args.force
-            else "FAST (rapido)"        if args.fast
-            else "normal (con cache por fase)")
-    print(f"  Modo:            {modo}")
+    banner_inicio()
+
+    kv("Directorio raiz",  ROOT)
+    kv("Seed",             SEED)
+    kv("Backend MLP",      "PyTorch (cudnn.deterministic = True)")
+    modo = ("FORCE — re-entrenar todo" if args.force
+            else "FAST — modo rapido"   if args.fast
+            else "normal — cache por fase activado")
+    kv("Modo",             modo)
     t_start = time.time()
 
     def cached(path):
@@ -1445,14 +1477,14 @@ regeneran tablas y figuras finales. La ejecucion completa desde cero tarda
 
     # ===== FASE 1: carga + EDA =====
     if cached(DATA_DIR / "df_merged.csv"):
-        print("\n  [cache] FASE 1 saltada: cargando df_merged.csv")
+        header("FASE 1 (carga y EDA) — recuperada de cache  ✓", level=1)
         df = pd.read_csv(DATA_DIR / "df_merged.csv")
     else:
         df = fase_1_carga_y_eda()
 
     # ===== FASE 2: seleccion + feature engineering =====
     if cached(DATA_DIR / "df_features.csv") and cached(TABLES_DIR / "06_feature_metadata.json"):
-        print("  [cache] FASE 2 saltada: cargando df_features.csv")
+        header("FASE 2 (seleccion de features) — recuperada de cache  ✓", level=1)
         df_features = pd.read_csv(DATA_DIR / "df_features.csv")
         with open(TABLES_DIR / "06_feature_metadata.json", encoding="utf-8") as f:
             meta = json.load(f)
@@ -1463,7 +1495,7 @@ regeneran tablas y figuras finales. La ejecucion completa desde cero tarda
     if (cached(DATA_DIR / "preprocessed.npz") and
         cached(MODELS_DIR / "preprocessor.joblib") and
         cached(TABLES_DIR / "07_class_weight.json")):
-        print("  [cache] FASE 3 saltada: cargando preprocessed.npz")
+        header("FASE 3 (preprocesado) — recuperada de cache  ✓", level=1)
         with open(TABLES_DIR / "07_class_weight.json") as f:
             class_weight = {int(k): float(v) for k, v in json.load(f).items()}
     else:
@@ -1478,13 +1510,13 @@ regeneran tablas y figuras finales. La ejecucion completa desde cero tarda
         cached(DATA_DIR / "predictions_ml.npz"),
     ])
     if ml_cached:
-        print("  [cache] FASE 4 saltada: 4 modelos ML ya entrenados")
+        header("FASE 4 (4 modelos ML clasicos) — recuperada de cache  ✓", level=1)
     else:
         fase_4_modelos_ml(class_weight, fast=args.fast)
 
     # ===== FASE 5: MLP en PyTorch =====
     if cached(MODELS_DIR / "mlp_best.pt") and cached(DATA_DIR / "predictions_mlp.npz"):
-        print("  [cache] FASE 5 saltada: MLP PyTorch ya entrenado")
+        header("FASE 5 (Red Neuronal MLP en PyTorch) — recuperada de cache  ✓", level=1)
         mlp_data = np.load(DATA_DIR / "predictions_mlp.npz", allow_pickle=True)
         best_t = float(mlp_data["best_threshold"])
     else:
@@ -1495,25 +1527,44 @@ regeneran tablas y figuras finales. La ejecucion completa desde cero tarda
 
     # ===== Resumen final =====
     elapsed = time.time() - t_start
-    section("PIPELINE COMPLETO — Resumen")
+    section("RESUMEN FINAL DEL PIPELINE")
 
-    print(f"\n  Tiempo total de ejecucion: {elapsed:.1f}s ({elapsed/60:.1f} min)")
-    print(f"\n  RANKING FINAL:")
-    print(df_final[["rank","modelo","f1","auc_roc","precision","recall"]].to_string(index=False))
+    print()
+    print(f"     Tiempo total de ejecucion: {elapsed:.1f} s  ({elapsed/60:.1f} min)")
+    print()
+    print("     Ranking final (ordenado por F1):")
+    print("     " + "─" * 70)
+    rk = df_final[["rank","modelo","f1","auc_roc","precision","recall"]].copy()
+    rk.columns = ["#", "Modelo", "F1", "AUC-ROC", "Precision", "Recall"]
+    rk_str = rk.to_string(index=False, justify="right")
+    for line in rk_str.split("\n"):
+        print("     " + line)
+    print("     " + "─" * 70)
+    print()
 
     ganador = df_final.iloc[0]
-    print(f"\n  MODELO RECOMENDADO: {ganador['modelo']}")
-    print(f"     F1        = {ganador['f1']:.4f}")
-    print(f"     AUC-ROC   = {ganador['auc_roc']:.4f}")
-    print(f"     Precision = {ganador['precision']:.4f}")
-    print(f"     Recall    = {ganador['recall']:.4f}")
+    width = 64
+    bar = "═" * width
+    print(f"     ╔{bar}╗")
+    print(f"     ║{'MODELO RECOMENDADO PARA DESPLIEGUE':^{width}}║")
+    print(f"     ╠{bar}╣")
+    print(f"     ║{'':<{width}}║")
+    print(f"     ║{ganador['modelo']:^{width}}║")
+    print(f"     ║{'':<{width}}║")
+    linea_metricas1 = f"F1 = {ganador['f1']:.4f}     AUC-ROC = {ganador['auc_roc']:.4f}"
+    linea_metricas2 = f"Precision = {ganador['precision']:.4f}     Recall = {ganador['recall']:.4f}"
+    print(f"     ║{linea_metricas1:^{width}}║")
+    print(f"     ║{linea_metricas2:^{width}}║")
+    print(f"     ║{'':<{width}}║")
+    print(f"     ╚{bar}╝")
+    print()
 
-    print(f"\n  Artefactos generados:")
-    print(f"     · {len(list(FIGS_DIR.glob('*.png')))} figuras en figs/")
-    print(f"     · {len(list(TABLES_DIR.glob('*')))} tablas en tables/")
-    print(f"     · {len(list(MODELS_DIR.glob('*')))} modelos en models/")
-    print("\n  Para generar el PPTX final ejecuta:  node generar_slides.js")
-    print("=" * 78)
+    print(f"     Artefactos generados:")
+    print(f"        · {len(list(FIGS_DIR.glob('*.png'))):>2} figuras  en  figs/")
+    print(f"        · {len(list(TABLES_DIR.glob('*'))):>2} tablas   en  tables/")
+    print(f"        · {len(list(MODELS_DIR.glob('*'))):>2} modelos  en  models/")
+    print()
+    print("━" * 78)
 
 
 if __name__ == "__main__":
