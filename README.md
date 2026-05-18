@@ -4,6 +4,8 @@
 
 UAX · Ingeniería Matemática · Inteligencia Artificial · Curso 2025/26
 
+Judith M.ª Salas García
+
 ---
 
 ## Descripción
@@ -76,8 +78,8 @@ caso_cancer/
 │
 ├── cancer_pipeline.py                 SCRIPT PRINCIPAL (ejecutar con python)
 │
-├── Entregable_5_diapositivas.pptx     entregable principal (PowerPoint)
-├── Entregable_5_diapositivas.pdf      entregable principal (PDF)
+├── cancer_predictor.pptx     entregable principal (PowerPoint)
+├── cancer_predictor.pdf      entregable principal (PDF)
 │
 ├── data/                              CSV originales y datasets derivados
 │   ├── CASOCANCER_*.csv (6 archivos)
