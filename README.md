@@ -89,7 +89,7 @@ caso_cancer/
 │   ├── predictions_ml.npz             probabilidades de los 4 ML
 │   └── predictions_mlp.npz            probabilidades del MLP
 │
-├── figs/                              25 figuras en PNG
+├── figs/                              24 figuras en PNG
 │   ├── 01-09  EDA y preprocesamiento
 │   ├── 10-14  Modelos ML clásicos
 │   ├── 15-18  Red neuronal MLP
